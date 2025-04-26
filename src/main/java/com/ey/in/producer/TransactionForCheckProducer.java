@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransactionForCheckProducer {
 
-    @Value(value = "${validation.topic:transaction-validation}")
-    private String validationTopic;
+    @Value(value = "${validation.topic:txn-fraud-check-validation}")
+    private String validationTopicName;
 
     final KafkaTemplate<String, String> kafkaTemplate;
 
@@ -17,8 +17,8 @@ public class TransactionForCheckProducer {
     }
 
     public void sendMessage(String message) {
-        kafkaTemplate.send(validationTopic, message);
-        System.out.println("Sending message: " + message);
+        kafkaTemplate.send(validationTopicName, message);
+        System.out.println("Message sent for fraud check: " + message);
 
     }
 }
