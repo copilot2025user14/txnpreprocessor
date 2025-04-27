@@ -1,14 +1,18 @@
 package com.ey.in.producer;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import com.ey.in.model.Transaction;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+import static io.lettuce.core.pubsub.PubSubOutput.Type.message;
+
+@Slf4j
 @Component
 public class TransactionForCheckProducer {
-
-    @Value(value = "${validation.topic:transaction-validation}")
-    private String validationTopic;
 
     final KafkaTemplate<String, String> kafkaTemplate;
 
@@ -16,9 +20,16 @@ public class TransactionForCheckProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessage(String message) {
-        kafkaTemplate.send(validationTopic, message);
-        System.out.println("Sending message: " + message);
 
+    public void publishTransactions(List<Transaction> transactions, String topicName) {
+        for(Transaction transaction : transactions) {
+            try{
+                String message = new ObjectMapper().writeValueAsString(transaction);
+                kafkaTemplate.send(topicName, message);
+            }catch (Exception e)   {
+                log.error("Unable to publish message to topic: {}", topicName);
+            }
+            log.info("Publishing transaction to {}: {}", message, topicName);
+        }
     }
 }
