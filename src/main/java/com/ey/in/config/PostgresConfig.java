@@ -50,7 +50,7 @@ public class PostgresConfig {
         return builder
                 .dataSource(postgresDataSource())
                 .packages("com.ey.in.entity")
-                .persistenceUnit("postgresPU")
+                .persistenceUnit("postgres")
                 .properties(jpaProperties())
                 .build();
     }
